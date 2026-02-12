@@ -12,6 +12,7 @@ npm run ci
 Expected:
 - RG-01 PASS
 - RG-02 PASS
+- RG-03 PASS
 - RG-04 PASS
 - RG-07 PASS
 
