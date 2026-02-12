@@ -8,6 +8,7 @@
   },
   "scripts": {
     "ci": "node ./tools/run-ci-gate.mjs --mode fixtures",
-    "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json"
+    "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json",
+    "ci:replays": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --replays 25"
   }
 }

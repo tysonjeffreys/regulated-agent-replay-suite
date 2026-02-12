@@ -34,6 +34,12 @@ You can also try the included example (`candidates.example.json`):
 npm run ci:candidates
 ```
 
+Replay stress run (candidate-order shuffle, 25 replays):
+
+```bash
+npm run ci:replays
+```
+
 ## Folder layout
 
 - `replay-suite/v0/` – suite definitions + config + fixtures

@@ -14,6 +14,12 @@ Included example:
 node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json
 ```
 
+Replay run (candidate-order shuffle):
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --replays 25
+```
+
 ## Accepted file shapes
 
 The candidates file can be either:
@@ -103,4 +109,13 @@ Report includes:
 - run mode
 - candidate file path + candidate count
 - best and evaluated candidates per must-pass scenario
+- replay fields:
+  - `replays_requested`
+  - `replays_ran`
+  - `replay_winners` (winner id per replay)
+  - `winner_histogram` (winner id -> count)
+  - `volatility` (`1 - max_winner_count / replays_ran`)
+  - `pass_rate` (fraction of replay winners that pass)
+  - `abstain_distribution` (winner abstain true/false counts)
+  - `tie_distribution` (winner tie-mass high/low/missing counts)
 - final suite pass/fail

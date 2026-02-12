@@ -24,6 +24,79 @@ function asNonEmptyString(value) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function parsePositiveInteger(value, flagName) {
+  const parsed = Number.parseInt(String(value), 10);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    console.error(`${flagName} must be a positive integer (got: ${value})`);
+    process.exit(2);
+  }
+  return parsed;
+}
+
+function shuffledCopy(values) {
+  const copy = [...values];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = tmp;
+  }
+  return copy;
+}
+
+function emptyReplayStats() {
+  return {
+    replay_winners: [],
+    winner_histogram: {},
+    volatility: 0,
+    pass_rate: 0,
+    abstain_distribution: { abstain: 0, no_abstain: 0 },
+    tie_distribution: { high_tie_mass: 0, low_tie_mass: 0, missing: 0 }
+  };
+}
+
+function runReplaySet({ candidates, scenario, config, mode, replaysRan }) {
+  const stats = emptyReplayStats();
+  if (replaysRan <= 0 || candidates.length === 0) return stats;
+
+  let passCount = 0;
+  for (let replay = 0; replay < replaysRan; replay += 1) {
+    const replayCandidates =
+      mode === "candidates" && replaysRan > 1 ? shuffledCopy(candidates) : [...candidates];
+    const tieBreak = mode === "candidates" && replaysRan > 1 ? "input_order" : "candidate_id";
+
+    const { best } = pickBestCandidate({ candidates: replayCandidates, scenario, config, tieBreak });
+    const winnerId = best?.candidate_id ?? null;
+
+    stats.replay_winners.push(winnerId);
+    if (winnerId) {
+      stats.winner_histogram[winnerId] = (stats.winner_histogram[winnerId] ?? 0) + 1;
+    }
+    if (best?.pass) passCount += 1;
+
+    const winnerRecord = winnerId ? candidates.find((c) => c.id === winnerId) : null;
+    if (Boolean(winnerRecord?.output?.uncertainty?.abstain)) {
+      stats.abstain_distribution.abstain += 1;
+    } else {
+      stats.abstain_distribution.no_abstain += 1;
+    }
+
+    const tieMass = winnerRecord?.output?.uncertainty?.tie_mass;
+    if (typeof tieMass !== "number") stats.tie_distribution.missing += 1;
+    else if (tieMass >= 0.4) stats.tie_distribution.high_tie_mass += 1;
+    else stats.tie_distribution.low_tie_mass += 1;
+  }
+
+  const maxWinnerCount = Object.values(stats.winner_histogram).reduce(
+    (max, count) => (count > max ? count : max),
+    0
+  );
+
+  stats.pass_rate = passCount / replaysRan;
+  stats.volatility = 1 - maxWinnerCount / replaysRan;
+  return stats;
+}
+
 function normalizeCandidatesPayload(loaded) {
   let source = null;
   if (Array.isArray(loaded)) source = loaded;
@@ -84,6 +157,8 @@ function normalizeCandidatesPayload(loaded) {
 }
 
 const mode = getArg("--mode", "fixtures");
+const replaysRequested = parsePositiveInteger(getArg("--replays", "1"), "--replays");
+const replaysRan = mode === "fixtures" ? 1 : replaysRequested;
 
 const suiteRoot = path.resolve(__dirname, "..", "replay-suite", "v0");
 const ciGatePath = path.join(suiteRoot, "ci-gate.json");
@@ -95,6 +170,10 @@ const reportPath = path.join(reportDir, "latest.json");
 if (!["fixtures", "candidates"].includes(mode)) {
   console.error(`Supported modes: fixtures | candidates (got: ${mode})`);
   process.exit(2);
+}
+
+if (mode === "fixtures" && replaysRequested !== 1) {
+  console.warn("Mode 'fixtures' is deterministic; forcing --replays to 1.");
 }
 
 const candidatesPathArg = getArg("--candidates", null);
@@ -134,6 +213,8 @@ const report = {
   suite_version: ciGate.suite_version,
   input_suite_version: inputSuiteVersion,
   run_mode: mode,
+  replays_requested: replaysRequested,
+  replays_ran: replaysRan,
   candidates_file: path.resolve(candidatesFilePath),
   candidates_count: allCandidates.length,
   ran_at: new Date().toISOString(),
@@ -147,23 +228,39 @@ for (const scenarioId of mustPass) {
   const scenario = scenarios[scenarioId];
   if (!scenario) {
     suitePass = false;
-    report.results[scenarioId] = { pass: false, error: "Missing scenario definition" };
+    report.results[scenarioId] = {
+      pass: false,
+      error: "Missing scenario definition",
+      replays_requested: replaysRequested,
+      replays_ran: 0,
+      ...emptyReplayStats()
+    };
     continue;
   }
 
   const scCandidates = allCandidates.filter((c) => c.scenario_id === scenarioId);
   if (scCandidates.length === 0) {
     suitePass = false;
-    report.results[scenarioId] = { pass: false, error: "No candidates found in candidates file" };
+    report.results[scenarioId] = {
+      pass: false,
+      error: "No candidates found in candidates file",
+      replays_requested: replaysRequested,
+      replays_ran: 0,
+      ...emptyReplayStats()
+    };
     continue;
   }
 
   const { best, evaluated } = pickBestCandidate({ candidates: scCandidates, scenario, config });
+  const replayStats = runReplaySet({ candidates: scCandidates, scenario, config, mode, replaysRan });
 
   report.results[scenarioId] = {
     scenario: { id: scenarioId, name: scenario.name, intent: scenario.intent },
     best,
-    evaluated
+    evaluated,
+    replays_requested: replaysRequested,
+    replays_ran: replaysRan,
+    ...replayStats
   };
 
   if (!best?.pass) suitePass = false;
@@ -171,6 +268,11 @@ for (const scenarioId of mustPass) {
   const status = best?.pass ? "PASS" : "FAIL";
   const score = best?.scores?.overall?.toFixed(3) ?? "n/a";
   console.log(`${scenarioId}  ${status}  overall=${score}  best=${best?.candidate_id ?? "n/a"}`);
+  if (replaysRan > 1) {
+    console.log(
+      `  replays pass_rate=${replayStats.pass_rate.toFixed(3)} volatility=${replayStats.volatility.toFixed(3)}`
+    );
+  }
   if (!best?.pass) {
     for (const f of best?.failures ?? []) console.log(`  - ${f}`);
   }
