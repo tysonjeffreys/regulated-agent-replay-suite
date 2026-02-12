@@ -15,8 +15,6 @@ Expected:
 - RG-02 PASS
 - RG-03 PASS
 - RG-04 PASS
-- RG-05 PASS
-- RG-06 PASS
 - RG-07 PASS
 
 A report is written to:
@@ -52,9 +50,14 @@ npm run ci:replays
 CI workflow:
 - `.github/workflows/trust-signal.yml` runs `npm ci`, `npm run ci`, `npm run ci:candidates`, and `npm run ci:replays` on push and pull requests.
 
+Scenario tiers:
+- `replay-suite/v0/ci-gate.json` is the stop-the-world gate (small, stable must-pass set).
+- `replay-suite/v0/suite.json` is the extended governance battery (includes RG-05 and RG-06).
+
 ## Folder layout
 
 - `replay-suite/v0/` – suite definitions + config + fixtures
+- `replay-suite/v0/suite.json` – extended scenario battery definitions
 - `replay-suite/v0/lib/` – evaluator + deterministic fixture judge (ESM)
 - `tools/run-ci-gate.mjs` – runner wiring + report emission
 - `docs/` – candidate schema + notes

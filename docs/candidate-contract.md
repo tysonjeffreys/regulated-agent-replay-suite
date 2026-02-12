@@ -72,7 +72,8 @@ Rules:
   - must be unique within the file
 - `scenario_id`:
   - required either at top-level (`scenario_id`) or in `output.scenario_id`
-  - must match a scenario in `replay-suite/v0/ci-gate.json`
+  - should match a scenario in `replay-suite/v0/suite.json`
+  - note: `npm run ci` / `npm run ci:candidates` enforce only `replay-suite/v0/ci-gate.json` must-pass subset
 - `output`:
   - required object for canonical entries
   - harness also accepts a raw output object as an entry (no wrapper), as long as it includes `scenario_id`
@@ -88,6 +89,8 @@ Required fields and scoring config:
 - `replay-suite/v0/ci-gate.json`
   - scenario-specific `expect` rules
   - `must_pass` scenario list
+- `replay-suite/v0/suite.json`
+  - full scenario battery (including extended non-gating scenarios)
 
 Current scoring dimensions are:
 
