@@ -1,4 +1,5 @@
 # Requested Agent Replay Suite (v0)
+[![Trust Signal](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml)
 
 A runnable, deterministic CI gate for “regulated agent” behavior.
 
@@ -21,6 +22,10 @@ A report is written to:
 
 Runtime:
 - Node.js 18+
+
+## Versioning
+
+This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures. The current release tag is `v0.1.0` for the first public trust-signal baseline.
 
 ## Candidate mode
 
@@ -51,4 +56,5 @@ CI workflow:
 - `replay-suite/v0/lib/` – evaluator + deterministic fixture judge (ESM)
 - `tools/run-ci-gate.mjs` – runner wiring + report emission
 - `docs/` – candidate schema + notes
+- `docs/scenario-paper-map.md` – suggested mapping from scenarios to paper sections
 - `candidates.example.json` – top-level example payload for `--mode candidates`
