@@ -1,0 +1,10 @@
+{
+  "name": "requested-agent-replay-suite",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "ci": "node ./tools/run-ci-gate.mjs --mode fixtures",
+    "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./replay-suite/v0/candidates.example.json"
+  }
+}
