@@ -1,7 +1,10 @@
 {
   "suite_version": "v0",
-  "run_mode": "fixtures",
-  "ran_at": "2026-02-12T15:00:37.890Z",
+  "input_suite_version": "v0",
+  "run_mode": "candidates",
+  "candidates_file": "/Users/tmoney/work/baseline_project/regulated-agent-replay-suite/candidates.example.json",
+  "candidates_count": 6,
+  "ran_at": "2026-02-12T15:35:22.827Z",
   "must_pass": [
     "RG-01",
     "RG-04",

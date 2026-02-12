@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "ci": "node ./tools/run-ci-gate.mjs --mode fixtures",
-    "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./replay-suite/v0/candidates.example.json"
+    "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json"
   }
 }

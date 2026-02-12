@@ -14,6 +14,75 @@ function getArg(name, fallback = null) {
   return process.argv[idx + 1] ?? fallback;
 }
 
+function isRecord(value) {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function asNonEmptyString(value) {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeCandidatesPayload(loaded) {
+  let source = null;
+  if (Array.isArray(loaded)) source = loaded;
+  if (source === null && isRecord(loaded) && Array.isArray(loaded.candidates)) {
+    source = loaded.candidates;
+  }
+
+  if (!Array.isArray(source)) {
+    return {
+      candidates: [],
+      errors: ["Candidates file must be a JSON array or an object with a candidates array."]
+    };
+  }
+
+  const candidates = [];
+  const errors = [];
+  const seenIds = new Set();
+
+  for (let i = 0; i < source.length; i += 1) {
+    const raw = source[i];
+    if (!isRecord(raw)) {
+      errors.push(`candidates[${i}] must be an object.`);
+      continue;
+    }
+
+    let output = null;
+    if (isRecord(raw.output)) output = raw.output;
+    if (output === null && raw.output === undefined && asNonEmptyString(raw.scenario_id)) output = raw;
+
+    if (output === null) {
+      errors.push(
+        `candidates[${i}] must include output as an object (or be a raw output object).`
+      );
+      continue;
+    }
+
+    const scenarioId = asNonEmptyString(raw.scenario_id) ?? asNonEmptyString(output.scenario_id);
+    if (!scenarioId) {
+      errors.push(`candidates[${i}] is missing scenario_id (top-level or output.scenario_id).`);
+      continue;
+    }
+
+    const candidateId = asNonEmptyString(raw.id) ?? `candidate_${i + 1}`;
+    if (seenIds.has(candidateId)) {
+      errors.push(`Duplicate candidate id "${candidateId}" found at candidates[${i}].`);
+      continue;
+    }
+    seenIds.add(candidateId);
+
+    candidates.push({
+      id: candidateId,
+      scenario_id: scenarioId,
+      output
+    });
+  }
+
+  return { candidates, errors };
+}
+
 const mode = getArg("--mode", "fixtures");
 
 const suiteRoot = path.resolve(__dirname, "..", "replay-suite", "v0");
@@ -43,16 +112,30 @@ if (mode === "candidates") {
 }
 
 const loaded = await loadJson(candidatesFilePath);
+const { candidates: allCandidates, errors: candidateErrors } = normalizeCandidatesPayload(loaded);
 
-// candidates file can be { candidates: [...] } OR raw [...]
-const allCandidates = Array.isArray(loaded) ? loaded : loaded.candidates ?? loaded ?? [];
+if (candidateErrors.length > 0) {
+  console.error(`Invalid candidates payload in ${candidatesFilePath}`);
+  for (const err of candidateErrors) console.error(`  - ${err}`);
+  process.exit(2);
+}
+
+const inputSuiteVersion = isRecord(loaded) ? asNonEmptyString(loaded.suite_version) : null;
+if (inputSuiteVersion && inputSuiteVersion !== ciGate.suite_version) {
+  console.warn(
+    `Warning: candidates suite_version "${inputSuiteVersion}" does not match gate suite_version "${ciGate.suite_version}".`
+  );
+}
 
 const mustPass = ciGate.must_pass ?? [];
 const scenarios = ciGate.scenarios ?? {};
 
 const report = {
   suite_version: ciGate.suite_version,
+  input_suite_version: inputSuiteVersion,
   run_mode: mode,
+  candidates_file: path.resolve(candidatesFilePath),
+  candidates_count: allCandidates.length,
   ran_at: new Date().toISOString(),
   must_pass: mustPass,
   results: {}

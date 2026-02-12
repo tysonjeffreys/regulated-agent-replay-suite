@@ -1,42 +1,106 @@
 # Candidate Contract (v0)
 
-This harness evaluates *candidate outputs* for each scenario.
+This harness evaluates candidate outputs per scenario and selects one best candidate per scenario.
 
-## File shape
+## CLI usage
 
-A candidates file can be either:
-- an object with a `candidates` array, or
-- a raw array of candidates
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.json
+```
 
-Recommended:
+Included example:
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json
+```
+
+## Accepted file shapes
+
+The candidates file can be either:
+
+1. Envelope object:
 
 ```json
 {
   "suite_version": "v0",
-  "generated_at": "ISO8601",
+  "generated_at": "2026-02-12T11:38:28.125276Z",
   "candidates": [
     {
-      "id": "cand_001",
+      "id": "cand_rg01_good",
       "scenario_id": "RG-01",
-      "output": { "...": "..." }
+      "output": {}
     }
   ]
 }
 ```
 
-## Candidate fields
+2. Raw array:
 
-- `id` *(string, required)*: unique within the file
-- `scenario_id` *(string, required)*: must match a scenario in `ci-gate.json`
-- `output` *(object, required)*: the regulated-agent structured output
+```json
+[
+  {
+    "id": "cand_rg01_good",
+    "scenario_id": "RG-01",
+    "output": {}
+  }
+]
+```
 
-## Output required fields (enforced)
+## Candidate entry contract
 
-See `replay-suite/v0/evaluator-config.json`:
-- `required_fields`: list of required paths (e.g., `risk.uncertainty`, `actions[0].type`, etc.)
-- scenario expectations: rules in `ci-gate.json` (e.g., RG-04 must abstain + detect injection)
+Canonical entry:
 
-## Interpretation
+```json
+{
+  "id": "candidate_id",
+  "scenario_id": "RG-01",
+  "output": {}
+}
+```
 
-- The harness scores each output along A/T/M/S-style dimensions and applies scenario-specific rules.
-- The deterministic fixture judge selects the best candidate per scenario (PASS-first, then score).
+Rules:
+
+- `id`:
+  - optional but strongly recommended
+  - if missing, harness auto-generates `candidate_<index>`
+  - must be unique within the file
+- `scenario_id`:
+  - required either at top-level (`scenario_id`) or in `output.scenario_id`
+  - must match a scenario in `replay-suite/v0/ci-gate.json`
+- `output`:
+  - required object for canonical entries
+  - harness also accepts a raw output object as an entry (no wrapper), as long as it includes `scenario_id`
+
+## Output requirements and scoring
+
+Required fields and scoring config:
+
+- `replay-suite/v0/evaluator-config.json`
+  - `required_fields`
+  - `weights`
+  - global thresholds
+- `replay-suite/v0/ci-gate.json`
+  - scenario-specific `expect` rules
+  - `must_pass` scenario list
+
+Current scoring dimensions are:
+
+- `A`: action discipline
+- `T`: trace quality
+- `M`: uncertainty discipline
+- `S`: safety
+
+The harness applies hard failures first (schema + scenario expectations), then applies minimum overall score threshold when hard failures are absent.
+
+## Report output
+
+The run writes:
+
+- `replay-suite/v0/reports/latest.json`
+
+Report includes:
+
+- run mode
+- candidate file path + candidate count
+- best and evaluated candidates per must-pass scenario
+- final suite pass/fail
