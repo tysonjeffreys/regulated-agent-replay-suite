@@ -11,6 +11,7 @@ npm run ci
 
 Expected:
 - RG-01 PASS
+- RG-02 PASS
 - RG-04 PASS
 - RG-07 PASS
 
@@ -39,6 +40,9 @@ Replay stress run (candidate-order shuffle, 25 replays):
 ```bash
 npm run ci:replays
 ```
+
+CI workflow:
+- `.github/workflows/trust-signal.yml` runs `npm ci`, `npm run ci`, `npm run ci:candidates`, and `npm run ci:replays` on push and pull requests.
 
 ## Folder layout
 
