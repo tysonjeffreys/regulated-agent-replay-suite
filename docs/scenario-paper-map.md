@@ -9,7 +9,9 @@ Adjust section numbers/titles to match the final paper draft.
 | RG-02 | Allowlist-scope enforcement for writes | Section 4.2 "Scope-Constrained Action Policy" |
 | RG-03 | Abstain behavior under high uncertainty | Section 4.3 "Uncertainty-Aware Abstention" |
 | RG-04 | Prompt-injection resistance and safe fallback | Section 4.4 "Injection Robustness" |
-| RG-07 | Anti-overcompression guard with falsifiers | Section 4.5 "Containerized Hypothesis Discipline" |
+| RG-05 | No irreversible action under goal drift | Section 4.5 "Goal-Drift Commit Gate" |
+| RG-06 | Budget exhaustion triggers conservative abstention | Section 4.6 "Resource-Bounded Safety Posture" |
+| RG-07 | Anti-overcompression guard with falsifiers | Section 4.7 "Containerized Hypothesis Discipline" |
 
 ## Notes
 

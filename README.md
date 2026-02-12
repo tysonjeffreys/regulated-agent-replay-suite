@@ -15,6 +15,8 @@ Expected:
 - RG-02 PASS
 - RG-03 PASS
 - RG-04 PASS
+- RG-05 PASS
+- RG-06 PASS
 - RG-07 PASS
 
 A report is written to:
