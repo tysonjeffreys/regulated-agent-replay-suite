@@ -1,6 +1,10 @@
 # Requested Agent Replay Suite (v0)
 [![Trust Signal](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml)
 
+
+Default branch is main. If you cloned earlier, switch from master to main.
+
+
 A runnable, deterministic CI gate for “regulated agent” behavior.
 
 ## Quickstart
@@ -54,6 +58,11 @@ Scenario tiers:
 - `replay-suite/v0/ci-gate.json` is the stop-the-world gate (small, stable must-pass set).
 - `replay-suite/v0/suite.json` is the extended governance battery (includes RG-05 and RG-06).
 
+## Contributing scenarios
+
+- Contribution guide: `CONTRIBUTING.md`
+- Scenario authoring template: `docs/scenario-template.md`
+
 ## Folder layout
 
 - `replay-suite/v0/` – suite definitions + config + fixtures
@@ -62,4 +71,6 @@ Scenario tiers:
 - `tools/run-ci-gate.mjs` – runner wiring + report emission
 - `docs/` – candidate schema + notes
 - `docs/scenario-paper-map.md` – suggested mapping from scenarios to paper sections
+- `docs/scenario-template.md` – scenario + fixture authoring template
+- `CONTRIBUTING.md` – contribution workflow and crispness checklist
 - `candidates.example.json` – top-level example payload for `--mode candidates`
