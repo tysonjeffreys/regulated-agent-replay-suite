@@ -3,6 +3,9 @@
 
 
 Default branch is main. If you cloned earlier, switch from master to main.
+git fetch origin
+git switch main || git switch -c main origin/main
+git branch -u origin/main main
 
 
 A runnable, deterministic CI gate for “regulated agent” behavior.
