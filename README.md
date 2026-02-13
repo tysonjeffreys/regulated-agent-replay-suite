@@ -1,14 +1,9 @@
 # Requested Agent Replay Suite (v0)
 [![Trust Signal](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml)
 
+A runnable, deterministic CI gate for "regulated agent" behavior.
 
-Default branch is main. If you cloned earlier, switch from master to main.
-git fetch origin
-git switch main || git switch -c main origin/main
-git branch -u origin/main main
-
-
-A runnable, deterministic CI gate for “regulated agent” behavior.
+This does not verify correctness; it verifies discipline under uncertainty: when to abstain, when commits are allowed, how injection is handled, and stability under replay.
 
 ## Quickstart
 
@@ -32,7 +27,12 @@ Runtime:
 
 ## Versioning
 
-This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures. The current release tag is `v0.1.0` for the first public trust-signal baseline.
+This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures.
+
+Current release tag: `v0.2.0`
+
+Release notes:
+- `RELEASE_NOTES.md`
 
 ## Candidate mode
 
@@ -54,8 +54,9 @@ Replay stress run (candidate-order shuffle, 25 replays):
 npm run ci:replays
 ```
 
-CI workflow:
-- `.github/workflows/trust-signal.yml` runs `npm ci`, `npm run ci`, `npm run ci:candidates`, and `npm run ci:replays` on push and pull requests.
+CI workflows:
+- `.github/workflows/ci.yml` runs `npm run ci` on Node 18 and 20.
+- `.github/workflows/trust-signal.yml` runs fixture, candidate, and replay gates on push and PRs.
 
 Scenario tiers:
 - `replay-suite/v0/ci-gate.json` is the stop-the-world gate (small, stable must-pass set).
@@ -68,12 +69,12 @@ Scenario tiers:
 
 ## Folder layout
 
-- `replay-suite/v0/` – suite definitions + config + fixtures
-- `replay-suite/v0/suite.json` – extended scenario battery definitions
-- `replay-suite/v0/lib/` – evaluator + deterministic fixture judge (ESM)
-- `tools/run-ci-gate.mjs` – runner wiring + report emission
-- `docs/` – candidate schema + notes
-- `docs/scenario-paper-map.md` – suggested mapping from scenarios to paper sections
-- `docs/scenario-template.md` – scenario + fixture authoring template
-- `CONTRIBUTING.md` – contribution workflow and crispness checklist
-- `candidates.example.json` – top-level example payload for `--mode candidates`
+- `replay-suite/v0/` - suite definitions + config + fixtures
+- `replay-suite/v0/suite.json` - extended scenario battery definitions
+- `replay-suite/v0/lib/` - evaluator + deterministic fixture judge (ESM)
+- `tools/run-ci-gate.mjs` - runner wiring + report emission
+- `docs/` - candidate schema + notes
+- `docs/scenario-paper-map.md` - suggested mapping from scenarios to paper sections
+- `docs/scenario-template.md` - scenario + fixture authoring template
+- `CONTRIBUTING.md` - contribution workflow and crispness checklist
+- `candidates.example.json` - top-level example payload for `--mode candidates`
