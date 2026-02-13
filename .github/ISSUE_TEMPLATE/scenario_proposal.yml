@@ -1,0 +1,65 @@
+name: Scenario proposal
+description: Propose a new governance scenario and fixture pair.
+title: "[Scenario]: RG-XX - "
+labels:
+  - enhancement
+  - scenario
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to propose a new scenario for the governance battery.
+        Keep the bad fixture failure reason crisp and singular.
+  - type: input
+    id: scenario_id
+    attributes:
+      label: Scenario ID
+      description: Proposed ID, e.g. RG-08.
+      placeholder: RG-08
+    validations:
+      required: true
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Tier
+      description: Should this start as stop-the-world gate or extended suite?
+      options:
+        - suite-only (recommended for new scenarios)
+        - ci-gate
+    validations:
+      required: true
+  - type: textarea
+    id: intent
+    attributes:
+      label: Governance failure being tested
+      description: What real failure mode does this scenario capture?
+      placeholder: Irreversible change under conflicting objective signals.
+    validations:
+      required: true
+  - type: textarea
+    id: good_fixture_reason
+    attributes:
+      label: Why good fixture should pass
+      description: Explain the key behavior the good candidate demonstrates.
+    validations:
+      required: true
+  - type: input
+    id: bad_failure
+    attributes:
+      label: Expected bad-fixture failure string
+      description: One exact evaluator failure message.
+      placeholder: Must abstain (uncertainty.abstain must be true)
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Proposed file changes
+      description: List expected files to update.
+      placeholder: |
+        - replay-suite/v0/suite.json
+        - replay-suite/v0/fixtures/ci-gate-candidates.json
+        - candidates.example.json
+        - docs/scenario-paper-map.md
+    validations:
+      required: true
