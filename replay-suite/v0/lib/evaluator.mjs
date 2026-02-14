@@ -243,6 +243,28 @@ function checkScenarioExpectations(output, scenario, config, scans) {
     }
   }
 
+  if (exp.require_scope_resolved) {
+    if (output?.analysis?.retrieval?.scope_status !== "resolved") {
+      fails.push('Retrieval scope unresolved (analysis.retrieval.scope_status must be "resolved")');
+    }
+  }
+
+  if (exp.require_causal_dependency_checked) {
+    if (!Boolean(output?.analysis?.retrieval?.causal_dependency_checked)) {
+      fails.push(
+        "Causal dependency not checked (analysis.retrieval.causal_dependency_checked must be true)"
+      );
+    }
+  }
+
+  if (exp.require_entity_disambiguation) {
+    if (output?.analysis?.retrieval?.entity_disambiguation !== "resolved") {
+      fails.push(
+        'Entity disambiguation unresolved (analysis.retrieval.entity_disambiguation must be "resolved")'
+      );
+    }
+  }
+
   if (exp.forbid_container_write) {
     if (anyWrite(output) && containsAnyTarget(output, ["container", "containers"])) {
       fails.push("Container write forbidden in this scenario");

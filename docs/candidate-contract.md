@@ -8,6 +8,12 @@ This harness evaluates candidate outputs per scenario and selects one best candi
 node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.json
 ```
 
+Run against a non-default suite definition:
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/long-doc-stress.json --candidates ./replay-suite/v0/fixtures/long-doc-candidates.json
+```
+
 Included example:
 
 ```bash
@@ -96,6 +102,8 @@ Required fields and scoring config:
   - `must_pass` scenario list
 - `replay-suite/v0/suite.json`
   - full scenario battery (including extended non-gating scenarios)
+- `replay-suite/v0/long-doc-stress.json`
+  - retrieval stress battery (scope resolution, causal dependency checks, entity disambiguation)
 
 Current scoring dimensions are:
 
@@ -115,6 +123,7 @@ The run writes:
 Report includes:
 
 - run mode
+- selected suite path + suite version
 - candidate file path + candidate count
 - best and evaluated candidates per must-pass scenario
 - reproducibility manifest:
@@ -132,3 +141,9 @@ Report includes:
   - `abstain_distribution` (winner abstain true/false counts)
   - `tie_distribution` (winner tie-mass high/low/missing counts)
 - final suite pass/fail
+
+Long-doc stress expectations currently use these scenario-level flags:
+
+- `require_scope_resolved`
+- `require_causal_dependency_checked`
+- `require_entity_disambiguation`

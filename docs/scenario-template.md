@@ -12,7 +12,7 @@ intent: "<what governance failure this catches>"
 expected_bad_failure: "<one exact failure string expected from evaluator>"
 ```
 
-## 2) Scenario JSON block (`suite.json`)
+## 2) Scenario JSON block (`suite.json` or another suite file)
 
 ```json
 "RG-XX": {
@@ -28,7 +28,13 @@ expected_bad_failure: "<one exact failure string expected from evaluator>"
 
 Only include expectation fields needed for the behavior you are testing.
 
-## 3) Fixture pair (`ci-gate-candidates.json`)
+Optional retrieval-stress expectation flags (for long-doc scenarios):
+
+- `require_scope_resolved`
+- `require_causal_dependency_checked`
+- `require_entity_disambiguation`
+
+## 3) Fixture pair (matching fixture file for your suite)
 
 ### Good fixture (passes for intended reason)
 
@@ -82,12 +88,14 @@ Examples:
 
 ## 4) Tiering decision
 
-- Always add scenario to `replay-suite/v0/suite.json`
+- Add scenario to the suite definition you intend to run:
+  - governance battery: `replay-suite/v0/suite.json`
+  - long-doc stress battery: `replay-suite/v0/long-doc-stress.json`
 - Add to `replay-suite/v0/ci-gate.json` only when semantics are stable and regression signal is high-confidence
 
 ## 5) Required follow-ups
 
-1. Sync `candidates.example.json` from fixture file.
+1. If this scenario belongs to the CI gate, sync `candidates.example.json` from `replay-suite/v0/fixtures/ci-gate-candidates.json`.
 2. Update `docs/scenario-paper-map.md`:
    - scenario tier
    - fixture IDs

@@ -242,9 +242,13 @@ function normalizeCandidatesPayload(loaded) {
 const mode = getArg("--mode", "fixtures");
 const replaysRequested = parsePositiveInteger(getArg("--replays", "1"), "--replays");
 const replaysRan = mode === "fixtures" ? 1 : replaysRequested;
+const suitePathArg = getArg("--suite", null);
 
 const suiteRoot = path.resolve(__dirname, "..", "replay-suite", "v0");
-const ciGatePath = path.join(suiteRoot, "ci-gate.json");
+const defaultSuitePath = path.join(suiteRoot, "ci-gate.json");
+const selectedSuitePath = suitePathArg
+  ? path.resolve(process.cwd(), suitePathArg)
+  : defaultSuitePath;
 const configPath = path.join(suiteRoot, "evaluator-config.json");
 const fixturesPath = path.join(suiteRoot, "fixtures", "ci-gate-candidates.json");
 const reportDir = path.join(suiteRoot, "reports");
@@ -262,7 +266,7 @@ if (mode === "fixtures" && replaysRequested !== 1) {
 
 const candidatesPathArg = getArg("--candidates", null);
 
-const ciGate = await loadJson(ciGatePath);
+const selectedSuite = await loadJson(selectedSuitePath);
 const config = await loadJson(configPath);
 const pkg = await loadJson(packageJsonPath);
 
@@ -285,26 +289,27 @@ if (candidateErrors.length > 0) {
 }
 
 const inputSuiteVersion = isRecord(loaded) ? asNonEmptyString(loaded.suite_version) : null;
-if (inputSuiteVersion && inputSuiteVersion !== ciGate.suite_version) {
+if (inputSuiteVersion && inputSuiteVersion !== selectedSuite.suite_version) {
   console.warn(
-    `Warning: candidates suite_version "${inputSuiteVersion}" does not match gate suite_version "${ciGate.suite_version}".`
+    `Warning: candidates suite_version "${inputSuiteVersion}" does not match gate suite_version "${selectedSuite.suite_version}".`
   );
 }
 
 const envelopeReproducibility = collectEnvelopeReproducibility(loaded);
-const [ciGateSha256, evaluatorConfigSha256, candidatesFileSha256] = await Promise.all([
-  sha256File(ciGatePath),
+const [selectedSuiteSha256, evaluatorConfigSha256, candidatesFileSha256] = await Promise.all([
+  sha256File(selectedSuitePath),
   sha256File(configPath),
   sha256File(candidatesFilePath)
 ]);
 const candidatesNormalizedSha256 = sha256Json(allCandidates);
 const candidateIds = allCandidates.map((candidate) => candidate.id);
 
-const mustPass = ciGate.must_pass ?? [];
-const scenarios = ciGate.scenarios ?? {};
+const mustPass = selectedSuite.must_pass ?? [];
+const scenarios = selectedSuite.scenarios ?? {};
 
 const report = {
-  suite_version: ciGate.suite_version,
+  suite_version: selectedSuite.suite_version,
+  suite_path: path.resolve(selectedSuitePath),
   input_suite_version: inputSuiteVersion,
   run_mode: mode,
   replays_requested: replaysRequested,
@@ -331,8 +336,11 @@ const report = {
         hostname: os.hostname()
       },
       inputs: {
-        ci_gate_path: path.resolve(ciGatePath),
-        ci_gate_sha256: ciGateSha256,
+        suite_path: path.resolve(selectedSuitePath),
+        suite_sha256: selectedSuiteSha256,
+        // Backward-compatible aliases retained for existing report readers.
+        ci_gate_path: path.resolve(selectedSuitePath),
+        ci_gate_sha256: selectedSuiteSha256,
         evaluator_config_path: path.resolve(configPath),
         evaluator_config_sha256: evaluatorConfigSha256,
         candidates_path: path.resolve(candidatesFilePath),
