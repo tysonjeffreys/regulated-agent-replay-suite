@@ -29,10 +29,20 @@ Runtime:
 
 This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures.
 
-Current release tag: `v0.2.0`
+Current release tag: `v0.3.0`
 
 Release notes:
 - `RELEASE_NOTES.md`
+
+## Reproducibility & audit
+
+The suite treats reproducibility as an engineering contract:
+
+- `R0` replayable operations (default requirement)
+- `R1` deterministic outputs for regulated fields
+- `R2` distributional reproducibility for generative analysis (stable tie/abstain signals under replay)
+
+See `docs/reproducibility-contract.md` for required manifest fields and optional runtime metadata.
 
 ## Candidate mode
 
@@ -76,5 +86,6 @@ Scenario tiers:
 - `docs/` - candidate schema + notes
 - `docs/scenario-paper-map.md` - suggested mapping from scenarios to paper sections
 - `docs/scenario-template.md` - scenario + fixture authoring template
+- `docs/reproducibility-contract.md` - reproducibility modes + manifest schema
 - `CONTRIBUTING.md` - contribution workflow and crispness checklist
 - `candidates.example.json` - top-level example payload for `--mode candidates`

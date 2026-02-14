@@ -1,5 +1,20 @@
 # Release Notes
 
+## v0.3.0 (2026-02-14)
+
+### What changed
+- Added a first-class reproducibility contract and manifest in run reports.
+- Runner now records input/config/candidate SHA-256 hashes, runtime environment, scenario selection, and per-scenario posture/trace transitions.
+- Added `docs/reproducibility-contract.md` and linked reproducibility guidance from README and candidate contract docs.
+
+### Stable
+- `R0` replayable operations as the default suite contract.
+- Deterministic fixture-gate behavior for `ci-gate` scenarios remains unchanged.
+
+### Experimental
+- `R1` and `R2` mode framing is documented for future enforcement, but currently advisory.
+- External runtime metadata ingestion (`reproducibility` envelope fields) is optional and source-provided.
+
 ## v0.2.0 (2026-02-13)
 
 ### What changed

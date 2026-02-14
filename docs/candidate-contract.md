@@ -40,6 +40,11 @@ The candidates file can be either:
 }
 ```
 
+Optional envelope metadata:
+
+- include `reproducibility` object when available
+- schema and recommended fields are defined in `docs/reproducibility-contract.md`
+
 2. Raw array:
 
 ```json
@@ -112,6 +117,11 @@ Report includes:
 - run mode
 - candidate file path + candidate count
 - best and evaluated candidates per must-pass scenario
+- reproducibility manifest:
+  - `reproducibility_contract.mode`
+  - `reproducibility_contract.manifest`
+  - `reproducibility_contract.selection_outcomes`
+  - `reproducibility_contract.posture_transitions`
 - replay fields:
   - `replays_requested`
   - `replays_ran`

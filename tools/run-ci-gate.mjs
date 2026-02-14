@@ -1,6 +1,8 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs/promises";
+import os from "node:os";
+import crypto from "node:crypto";
 
 import { loadJson } from "../replay-suite/v0/lib/evaluator.mjs";
 import { pickBestCandidate } from "../replay-suite/v0/lib/fixture-judge.mjs";
@@ -31,6 +33,87 @@ function parsePositiveInteger(value, flagName) {
     process.exit(2);
   }
   return parsed;
+}
+
+function sha256(value) {
+  return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function sha256Json(value) {
+  return sha256(JSON.stringify(value));
+}
+
+async function sha256File(filePath) {
+  const raw = await fs.readFile(filePath);
+  return sha256(raw);
+}
+
+function normalizeObject(value) {
+  return isRecord(value) ? value : null;
+}
+
+function normalizeArray(value) {
+  return Array.isArray(value) ? value : null;
+}
+
+function collectEnvelopeReproducibility(loaded) {
+  if (!isRecord(loaded)) return null;
+  const repro = isRecord(loaded.reproducibility) ? loaded.reproducibility : loaded;
+
+  const modelIdentifier =
+    asNonEmptyString(repro.model_identifier) ??
+    asNonEmptyString(repro.model_id) ??
+    asNonEmptyString(loaded.model_identifier) ??
+    asNonEmptyString(loaded.model_id) ??
+    null;
+
+  const promptTemplateHash =
+    asNonEmptyString(repro.prompt_template_hash) ??
+    asNonEmptyString(loaded.prompt_template_hash) ??
+    null;
+
+  return {
+    model_identifier: modelIdentifier,
+    prompt_template_hash: promptTemplateHash,
+    decoding_parameters: normalizeObject(repro.decoding_parameters ?? repro.decoding),
+    tool_versions: normalizeObject(repro.tool_versions),
+    retrieval_snapshot_hashes: normalizeArray(repro.retrieval_snapshot_hashes),
+    retrieval_snapshots: normalizeArray(repro.retrieval_snapshots),
+    phase_transitions: normalizeArray(repro.phase_transitions),
+    posture_transitions: normalizeArray(repro.posture_transitions)
+  };
+}
+
+function emptyScenarioReproducibility() {
+  return {
+    candidate_ids: [],
+    winner_candidate_id: null,
+    winner_abstain: null,
+    winner_tie_mass: null,
+    phase: null,
+    posture: null,
+    trace_decisions: []
+  };
+}
+
+function scenarioWinnerReproducibility({ candidates, winnerCandidateId }) {
+  const details = emptyScenarioReproducibility();
+  details.candidate_ids = candidates.map((c) => c.id);
+  details.winner_candidate_id = winnerCandidateId;
+
+  const winner = winnerCandidateId ? candidates.find((c) => c.id === winnerCandidateId) : null;
+  const output = winner?.output ?? null;
+  if (!isRecord(output)) return details;
+
+  if (isRecord(output.uncertainty)) {
+    details.winner_abstain = Boolean(output.uncertainty.abstain);
+    details.winner_tie_mass =
+      typeof output.uncertainty.tie_mass === "number" ? output.uncertainty.tie_mass : null;
+  }
+  details.phase = asNonEmptyString(output.phase);
+  details.posture = asNonEmptyString(output.posture);
+  details.trace_decisions = normalizeArray(output?.trace?.decisions) ?? [];
+  return details;
 }
 
 function shuffledCopy(values) {
@@ -166,6 +249,7 @@ const configPath = path.join(suiteRoot, "evaluator-config.json");
 const fixturesPath = path.join(suiteRoot, "fixtures", "ci-gate-candidates.json");
 const reportDir = path.join(suiteRoot, "reports");
 const reportPath = path.join(reportDir, "latest.json");
+const packageJsonPath = path.resolve(__dirname, "..", "package.json");
 
 if (!["fixtures", "candidates"].includes(mode)) {
   console.error(`Supported modes: fixtures | candidates (got: ${mode})`);
@@ -180,6 +264,7 @@ const candidatesPathArg = getArg("--candidates", null);
 
 const ciGate = await loadJson(ciGatePath);
 const config = await loadJson(configPath);
+const pkg = await loadJson(packageJsonPath);
 
 let candidatesFilePath = fixturesPath;
 if (mode === "candidates") {
@@ -206,6 +291,15 @@ if (inputSuiteVersion && inputSuiteVersion !== ciGate.suite_version) {
   );
 }
 
+const envelopeReproducibility = collectEnvelopeReproducibility(loaded);
+const [ciGateSha256, evaluatorConfigSha256, candidatesFileSha256] = await Promise.all([
+  sha256File(ciGatePath),
+  sha256File(configPath),
+  sha256File(candidatesFilePath)
+]);
+const candidatesNormalizedSha256 = sha256Json(allCandidates);
+const candidateIds = allCandidates.map((candidate) => candidate.id);
+
 const mustPass = ciGate.must_pass ?? [];
 const scenarios = ciGate.scenarios ?? {};
 
@@ -219,7 +313,39 @@ const report = {
   candidates_count: allCandidates.length,
   ran_at: new Date().toISOString(),
   must_pass: mustPass,
-  results: {}
+  results: {},
+  reproducibility_contract: {
+    mode: "R0",
+    mode_definition: "Replayable operations",
+    manifest: {
+      runner: {
+        name: asNonEmptyString(pkg?.name) ?? "requested-agent-replay-suite",
+        version: asNonEmptyString(pkg?.version),
+        command: process.argv.join(" "),
+        cwd: process.cwd()
+      },
+      system: {
+        node_version: process.version,
+        platform: process.platform,
+        arch: process.arch,
+        hostname: os.hostname()
+      },
+      inputs: {
+        ci_gate_path: path.resolve(ciGatePath),
+        ci_gate_sha256: ciGateSha256,
+        evaluator_config_path: path.resolve(configPath),
+        evaluator_config_sha256: evaluatorConfigSha256,
+        candidates_path: path.resolve(candidatesFilePath),
+        candidates_file_sha256: candidatesFileSha256,
+        candidates_normalized_sha256: candidatesNormalizedSha256,
+        candidate_ids: candidateIds
+      },
+      scenario_selection: mustPass,
+      external_runtime_metadata: envelopeReproducibility
+    },
+    selection_outcomes: [],
+    posture_transitions: []
+  }
 };
 
 let suitePass = true;
@@ -233,6 +359,7 @@ for (const scenarioId of mustPass) {
       error: "Missing scenario definition",
       replays_requested: replaysRequested,
       replays_ran: 0,
+      reproducibility: emptyScenarioReproducibility(),
       ...emptyReplayStats()
     };
     continue;
@@ -246,6 +373,7 @@ for (const scenarioId of mustPass) {
       error: "No candidates found in candidates file",
       replays_requested: replaysRequested,
       replays_ran: 0,
+      reproducibility: emptyScenarioReproducibility(),
       ...emptyReplayStats()
     };
     continue;
@@ -260,6 +388,10 @@ for (const scenarioId of mustPass) {
     evaluated,
     replays_requested: replaysRequested,
     replays_ran: replaysRan,
+    reproducibility: scenarioWinnerReproducibility({
+      candidates: scCandidates,
+      winnerCandidateId: best?.candidate_id ?? null
+    }),
     ...replayStats
   };
 
@@ -279,6 +411,29 @@ for (const scenarioId of mustPass) {
 }
 
 report.suite_pass = suitePass;
+report.reproducibility_contract.selection_outcomes = mustPass.map((scenarioId) => {
+  const result = report.results[scenarioId];
+  const repro = result?.reproducibility ?? emptyScenarioReproducibility();
+  return {
+    scenario_id: scenarioId,
+    pass: Boolean(result?.best?.pass ?? result?.pass ?? false),
+    winner_candidate_id: repro.winner_candidate_id,
+    winner_abstain: repro.winner_abstain,
+    winner_tie_mass: repro.winner_tie_mass,
+    pass_rate: typeof result?.pass_rate === "number" ? result.pass_rate : null,
+    volatility: typeof result?.volatility === "number" ? result.volatility : null
+  };
+});
+report.reproducibility_contract.posture_transitions = mustPass.map((scenarioId) => {
+  const repro = report.results[scenarioId]?.reproducibility ?? emptyScenarioReproducibility();
+  return {
+    scenario_id: scenarioId,
+    winner_candidate_id: repro.winner_candidate_id,
+    phase: repro.phase,
+    posture: repro.posture,
+    trace_decisions: repro.trace_decisions
+  };
+});
 
 await fs.mkdir(reportDir, { recursive: true });
 await fs.writeFile(reportPath, JSON.stringify(report, null, 2), "utf8");
