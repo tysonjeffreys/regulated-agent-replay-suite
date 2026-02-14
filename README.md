@@ -1,4 +1,4 @@
-# Requested Agent Replay Suite (v0.2.0)
+# Requested Agent Replay Suite (v0.3.0)
 [![Trust Signal](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml)
 
 A runnable, deterministic CI gate for "regulated agent" behavior.
