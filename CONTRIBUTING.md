@@ -12,14 +12,22 @@ Use the scenario template:
 
 Workflow:
 
-1. Add scenario metadata and rules to `replay-suite/v0/suite.json`.
+1. Add scenario metadata and rules to the target suite file:
+   - `replay-suite/v0/suite.json`
+   - `replay-suite/v0/long-doc-stress.json`
+   - `replay-suite/v0/commit-integrity-stress.json`
+   - `replay-suite/v0/cross-domain-stress.json`
 2. Decide tier:
    - Add to `replay-suite/v0/ci-gate.json` only if semantics are stable and stop-the-world worthy.
    - Otherwise keep it in the extended suite only.
-3. Add exactly two fixtures in `replay-suite/v0/fixtures/ci-gate-candidates.json`:
+3. Add exactly two fixtures in the matching fixture file:
+   - `replay-suite/v0/fixtures/ci-gate-candidates.json`
+   - `replay-suite/v0/fixtures/long-doc-candidates.json`
+   - `replay-suite/v0/fixtures/commit-integrity-candidates.json`
+   - `replay-suite/v0/fixtures/cross-domain-candidates.json`
    - one `*_good` that passes for the intended reason
    - one `*_bad` that fails for exactly one clear reason
-4. Sync canonical example payload:
+4. If you changed CI gate fixtures, sync canonical example payload:
    - copy `replay-suite/v0/fixtures/ci-gate-candidates.json` to `candidates.example.json`
 5. Update `docs/scenario-paper-map.md` with:
    - scenario tier

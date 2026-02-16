@@ -58,6 +58,18 @@ Extended long-doc retrieval stress suite (scope/causal/entity failure modes):
 npm run ci:longdoc
 ```
 
+Extended commit-integrity stress suite (no-evidence reversion, self-disowning, incentive conflict):
+
+```bash
+npm run ci:integrity
+```
+
+Optional cross-domain integration stress suite (false unification / bridge discipline):
+
+```bash
+npm run ci:crossdomain
+```
+
 ## Reproducibility and Audit
 
 The suite treats reproducibility as an engineering contract:
@@ -73,6 +85,18 @@ See `docs/reproducibility-contract.md` for required manifest fields and optional
 - `replay-suite/v0/ci-gate.json` is the stop-the-world gate (small, stable must-pass set).
 - `replay-suite/v0/suite.json` is the extended governance battery (includes `RG-05` and `RG-06`).
 - `replay-suite/v0/long-doc-stress.json` is an extended retrieval stress battery (`RG-08` to `RG-10`).
+- `replay-suite/v0/commit-integrity-stress.json` is an extended commitment-integrity battery (`RG-11` to `RG-13`).
+- `replay-suite/v0/cross-domain-stress.json` is an optional integration battery (`RG-14` to `RG-15`).
+
+## Optional Retrieval-Gate Signal
+
+`replay-suite/v0/evaluator-config.json` includes an optional `G` scoring channel for retrieval/integration gates:
+
+- bridge evidence
+- falsifier presence
+- scope penalty
+
+By default this signal is neutral (`retrieval_gate_signal.enabled=false`, `weights.G=0`) and does not affect existing CI outcomes.
 
 ## CI Workflows
 
@@ -99,8 +123,12 @@ Release notes:
 - `replay-suite/v0/`: suite definitions, config, fixtures, reports
 - `replay-suite/v0/suite.json`: extended scenario battery
 - `replay-suite/v0/long-doc-stress.json`: long-doc retrieval stress scenarios
+- `replay-suite/v0/commit-integrity-stress.json`: commitment-integrity stress scenarios
+- `replay-suite/v0/cross-domain-stress.json`: optional cross-domain integration scenarios
 - `replay-suite/v0/lib/`: evaluator and deterministic fixture judge (ESM)
 - `replay-suite/v0/fixtures/long-doc-candidates.json`: focused good/bad fixtures for `RG-08` to `RG-10`
+- `replay-suite/v0/fixtures/commit-integrity-candidates.json`: focused good/bad fixtures for `RG-11` to `RG-13`
+- `replay-suite/v0/fixtures/cross-domain-candidates.json`: focused good/bad fixtures for `RG-14` to `RG-15`
 - `tools/run-ci-gate.mjs`: runner wiring and report emission
 - `docs/candidate-contract.md`: candidate payload schema and contract
 - `docs/reproducibility-contract.md`: reproducibility modes and manifest schema

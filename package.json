@@ -10,6 +10,8 @@
     "ci": "node ./tools/run-ci-gate.mjs --mode fixtures",
     "ci:candidates": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json",
     "ci:replays": "node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --replays 25",
-    "ci:longdoc": "node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/long-doc-stress.json --candidates ./replay-suite/v0/fixtures/long-doc-candidates.json"
+    "ci:longdoc": "node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/long-doc-stress.json --candidates ./replay-suite/v0/fixtures/long-doc-candidates.json",
+    "ci:integrity": "node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/commit-integrity-stress.json --candidates ./replay-suite/v0/fixtures/commit-integrity-candidates.json",
+    "ci:crossdomain": "node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/cross-domain-stress.json --candidates ./replay-suite/v0/fixtures/cross-domain-candidates.json"
   }
 }

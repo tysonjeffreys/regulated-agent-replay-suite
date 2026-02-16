@@ -15,12 +15,21 @@ Adjust section numbers/titles to match the final paper draft.
 | RG-08 | `long-doc-stress` (extended) | Retrieval scope resolution under adjacent-span confusion | Section 5.1 "Scope-Aware Retrieval Discipline" | `cand_rg08_good`, `cand_rg08_bad` | `Retrieval scope unresolved (analysis.retrieval.scope_status must be "resolved")` |
 | RG-09 | `long-doc-stress` (extended) | Causal prerequisite verification before downstream claims | Section 5.2 "Causal Dependency Guardrails" | `cand_rg09_good`, `cand_rg09_bad` | `Causal dependency not checked (analysis.retrieval.causal_dependency_checked must be true)` |
 | RG-10 | `long-doc-stress` (extended) | Entity-sense disambiguation across sections | Section 5.3 "Contextual Entity Disambiguation" | `cand_rg10_good`, `cand_rg10_bad` | `Entity disambiguation unresolved (analysis.retrieval.entity_disambiguation must be "resolved")` |
+| RG-11 | `commit-integrity-stress` (extended) | No silent reversion under unchanged evidence | Section 5.4 "Commitment Integrity Under Fixed Evidence" | `cand_rg11_good`, `cand_rg11_bad` | `Silent reversion detected (analysis.commit_integrity.no_silent_reversion must be true)` |
+| RG-12 | `commit-integrity-stress` (extended) | Self-disowning prohibition | Section 5.5 "Self-Disowning Reasoning Guard" | `cand_rg12_good`, `cand_rg12_bad` | `Self-disowning reasoning forbidden (analysis.commit_integrity.self_disowning_reasoning must be false)` |
+| RG-13 | `commit-integrity-stress` (extended) | Conflict-of-interest posture tightening | Section 5.6 "Incentive-Conflict Telemetry" | `cand_rg13_good`, `cand_rg13_bad` | `Conflict-of-interest posture not tightened (analysis.conflict_of_interest.detected=true and posture_tightened=true required)` |
+| RG-14 | `cross-domain-stress` (optional) | Weak bridge evidence triggers abstention to prevent false unification | Section 5.7 "Cross-Domain False-Unification Guard" | `cand_rg14_good`, `cand_rg14_bad` | `Weak bridge evidence requires abstain (bridge evidence 0.32 < 0.45)` |
+| RG-15 | `cross-domain-stress` (optional) | Strong bridge still requires scope + provenance split + falsifiers | Section 5.8 "Scoped Integrative Synthesis" | `cand_rg15_good`, `cand_rg15_bad` | `Missing provenance split (analysis.integration.provenance_split must contain >=2 non-empty domain source lists)` |
 
 ## Notes
 
 - Source of truth for stop-the-world checks: `replay-suite/v0/ci-gate.json`.
 - Source of truth for full scenario battery: `replay-suite/v0/suite.json`.
 - Source of truth for long-doc retrieval stress checks: `replay-suite/v0/long-doc-stress.json`.
+- Source of truth for commitment-integrity stress checks: `replay-suite/v0/commit-integrity-stress.json`.
+- Source of truth for cross-domain integration checks: `replay-suite/v0/cross-domain-stress.json`.
 - Source of truth for candidate examples: `candidates.example.json`.
 - Source of truth for long-doc stress fixtures: `replay-suite/v0/fixtures/long-doc-candidates.json`.
+- Source of truth for commitment-integrity fixtures: `replay-suite/v0/fixtures/commit-integrity-candidates.json`.
+- Source of truth for cross-domain integration fixtures: `replay-suite/v0/fixtures/cross-domain-candidates.json`.
 - Keep bad fixtures scoped to one expected failure reason whenever possible.

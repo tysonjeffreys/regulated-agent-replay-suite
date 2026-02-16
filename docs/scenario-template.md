@@ -34,6 +34,20 @@ Optional retrieval-stress expectation flags (for long-doc scenarios):
 - `require_causal_dependency_checked`
 - `require_entity_disambiguation`
 
+Optional commitment-integrity expectation flags (for dialogue/selection integrity scenarios):
+
+- `require_no_silent_reversion`
+- `forbid_self_disowning_reasoning`
+- `require_conflict_posture_tightening`
+
+Optional cross-domain integration expectation flags (for bridge discipline scenarios):
+
+- `require_scope_statement`
+- `require_provenance_split`
+- `require_bridge_evidence`
+- `require_bridge_evidence_min`
+- `require_abstain_on_weak_bridge`
+
 ## 3) Fixture pair (matching fixture file for your suite)
 
 ### Good fixture (passes for intended reason)
@@ -91,6 +105,8 @@ Examples:
 - Add scenario to the suite definition you intend to run:
   - governance battery: `replay-suite/v0/suite.json`
   - long-doc stress battery: `replay-suite/v0/long-doc-stress.json`
+  - commitment-integrity battery: `replay-suite/v0/commit-integrity-stress.json`
+  - cross-domain integration battery: `replay-suite/v0/cross-domain-stress.json`
 - Add to `replay-suite/v0/ci-gate.json` only when semantics are stable and regression signal is high-confidence
 
 ## 5) Required follow-ups

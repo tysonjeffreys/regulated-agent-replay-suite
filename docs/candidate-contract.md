@@ -14,6 +14,18 @@ Run against a non-default suite definition:
 node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/long-doc-stress.json --candidates ./replay-suite/v0/fixtures/long-doc-candidates.json
 ```
 
+Commit-integrity stress run:
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/commit-integrity-stress.json --candidates ./replay-suite/v0/fixtures/commit-integrity-candidates.json
+```
+
+Cross-domain integration stress run:
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --suite ./replay-suite/v0/cross-domain-stress.json --candidates ./replay-suite/v0/fixtures/cross-domain-candidates.json
+```
+
 Included example:
 
 ```bash
@@ -104,6 +116,10 @@ Required fields and scoring config:
   - full scenario battery (including extended non-gating scenarios)
 - `replay-suite/v0/long-doc-stress.json`
   - retrieval stress battery (scope resolution, causal dependency checks, entity disambiguation)
+- `replay-suite/v0/commit-integrity-stress.json`
+  - commitment-integrity battery (no silent reversion, no self-disowning, conflict-of-interest posture tightening)
+- `replay-suite/v0/cross-domain-stress.json`
+  - optional cross-domain integration battery (false-unification resistance, scoped provenance discipline)
 
 Current scoring dimensions are:
 
@@ -111,6 +127,9 @@ Current scoring dimensions are:
 - `T`: trace quality
 - `M`: uncertainty discipline
 - `S`: safety
+- `G`: optional retrieval/integration gate signal (bridge evidence + falsifier presence + scope penalty)
+
+By default, `G` is neutral and non-participating (`retrieval_gate_signal.enabled=false`, `weights.G=0`).
 
 The harness applies hard failures first (schema + scenario expectations), then applies minimum overall score threshold when hard failures are absent.
 
@@ -126,6 +145,7 @@ Report includes:
 - selected suite path + suite version
 - candidate file path + candidate count
 - best and evaluated candidates per must-pass scenario
+  - includes `scores.G` and `signals.retrieval_gate` telemetry when present
 - reproducibility manifest:
   - `reproducibility_contract.mode`
   - `reproducibility_contract.manifest`
@@ -147,3 +167,17 @@ Long-doc stress expectations currently use these scenario-level flags:
 - `require_scope_resolved`
 - `require_causal_dependency_checked`
 - `require_entity_disambiguation`
+
+Commit-integrity stress expectations currently use these scenario-level flags:
+
+- `require_no_silent_reversion`
+- `forbid_self_disowning_reasoning`
+- `require_conflict_posture_tightening`
+
+Cross-domain integration stress expectations currently use these scenario-level flags:
+
+- `require_scope_statement`
+- `require_provenance_split`
+- `require_bridge_evidence`
+- `require_bridge_evidence_min`
+- `require_abstain_on_weak_bridge`

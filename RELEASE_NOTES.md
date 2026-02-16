@@ -1,5 +1,20 @@
 # Release Notes
 
+## Unreleased (2026-02-16)
+
+### What changed
+- Added optional cross-domain integration stress suite (`replay-suite/v0/cross-domain-stress.json`) with focused fixtures (`RG-14`, `RG-15`) for false-unification resistance.
+- Extended evaluator expectations for cross-domain discipline:
+  - `require_scope_statement`
+  - `require_provenance_split`
+  - `require_bridge_evidence`
+  - `require_bridge_evidence_min`
+  - `require_abstain_on_weak_bridge`
+- Added optional retrieval-gate scoring signal `G` (bridge evidence + falsifier presence + scope penalty) with neutral default config (`enabled=false`, `weights.G=0`).
+
+### Stable
+- Existing CI gate semantics (`RG-01`, `RG-02`, `RG-03`, `RG-04`, `RG-07`) remain unchanged by default.
+
 ## v0.3.0 (2026-02-14)
 
 ### What changed

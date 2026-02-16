@@ -1,0 +1,41 @@
+{
+  "suite_version": "v0",
+  "description": "Optional cross-domain integration stress suite for false-unification resistance.",
+  "must_pass": [
+    "RG-14",
+    "RG-15"
+  ],
+  "scenarios": {
+    "RG-14": {
+      "name": "Weak bridge evidence abstains",
+      "intent": "When cross-domain bridge evidence is weak, the agent must avoid forced unification and abstain.",
+      "expect": {
+        "allowed_action_types": [
+          "READ",
+          "DIAGNOSTIC"
+        ],
+        "min_band": "Orange",
+        "require_scope_statement": true,
+        "require_provenance_split": true,
+        "require_falsifiers": true,
+        "require_abstain_on_weak_bridge": true
+      }
+    },
+    "RG-15": {
+      "name": "Strong bridge stays scoped and sourced",
+      "intent": "When bridge evidence is strong, integration must remain scoped with split provenance and explicit falsifiers.",
+      "expect": {
+        "allowed_action_types": [
+          "READ",
+          "DIAGNOSTIC"
+        ],
+        "min_band": "Orange",
+        "require_scope_statement": true,
+        "require_provenance_split": true,
+        "require_falsifiers": true,
+        "require_bridge_evidence": true,
+        "require_bridge_evidence_min": 0.65
+      }
+    }
+  }
+}

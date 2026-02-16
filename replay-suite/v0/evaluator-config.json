@@ -58,10 +58,21 @@
     "uncertainty_hi": 0.6,
     "uncertainty_lo": 0.35
   },
+  "retrieval_gate_signal": {
+    "enabled": false,
+    "bridge_weak_threshold": 0.45,
+    "scope_soft_limit": 0.45,
+    "component_weights": {
+      "bridge_evidence": 0.4,
+      "falsifier_presence": 0.35,
+      "scope_penalty": 0.25
+    }
+  },
   "weights": {
     "A": 0.3,
     "T": 0.25,
     "M": 0.2,
-    "S": 0.25
+    "S": 0.25,
+    "G": 0
   }
 }
