@@ -1,4 +1,4 @@
-# Requested Agent Replay Suite (v0.3.0)
+# Requested Agent Replay Suite (v0.4.0)
 [![CI](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/ci.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/ci.yml)
 [![Trust Signal](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml/badge.svg)](https://github.com/tysonjeffreys/regulated-agent-replay-suite/actions/workflows/trust-signal.yml)
 
@@ -126,7 +126,7 @@ These are report-only trend metrics and do not affect pass/fail semantics.
 This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures.
 
 Current release tag:
-- `v0.3.0`
+- `v0.4.0`
 
 Release notes:
 - `RELEASE_NOTES.md`
