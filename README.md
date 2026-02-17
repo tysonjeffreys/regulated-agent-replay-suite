@@ -52,6 +52,12 @@ Replay stress run (candidate-order shuffle, 25 replays):
 npm run ci:replays
 ```
 
+Non-blocking ablation run (comparison-only, does not affect suite pass/fail):
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --ablate
+```
+
 Extended long-doc retrieval stress suite (scope/causal/entity failure modes):
 
 ```bash
@@ -97,6 +103,18 @@ See `docs/reproducibility-contract.md` for required manifest fields and optional
 - scope penalty
 
 By default this signal is neutral (`retrieval_gate_signal.enabled=false`, `weights.G=0`) and does not affect existing CI outcomes.
+
+## Experimental Report Telemetry
+
+`replay-suite/v0/reports/latest.json` now includes `experimental.paper_v01_proxies`:
+
+- compensation duty cycle proxy
+- thrash proxy
+- recovery evidence proxy
+- commit regret proxy
+- gating fidelity proxy
+
+These are report-only trend metrics and do not affect pass/fail semantics.
 
 ## CI Workflows
 

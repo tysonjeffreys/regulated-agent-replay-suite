@@ -38,6 +38,18 @@ Replay run (candidate-order shuffle):
 node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --replays 25
 ```
 
+Non-blocking ablation run (comparison-only):
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --ablate
+```
+
+Optional profile subset:
+
+```bash
+node ./tools/run-ci-gate.mjs --mode candidates --candidates ./candidates.example.json --ablate --ablate-profiles abstention_telemetry_off,retrieval_signal_on
+```
+
 ## Accepted file shapes
 
 The candidates file can be either:
@@ -160,7 +172,21 @@ Report includes:
   - `pass_rate` (fraction of replay winners that pass)
   - `abstain_distribution` (winner abstain true/false counts)
   - `tie_distribution` (winner tie-mass high/low/missing counts)
+- experimental telemetry fields:
+  - `experimental.paper_v01_proxies` (report-only proxy metrics)
+  - `experimental.ablations` (non-blocking comparison profiles when `--ablate` is enabled)
 - final suite pass/fail
+
+Supported ablation profiles:
+
+- `abstention_telemetry_off`
+- `rollback_requirements_off`
+- `retrieval_signal_on`
+
+Important:
+
+- ablations are non-blocking and do not modify `suite_pass`
+- paper proxy metrics are telemetry-only and do not affect pass/fail
 
 Long-doc stress expectations currently use these scenario-level flags:
 
