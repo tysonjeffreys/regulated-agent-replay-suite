@@ -23,6 +23,8 @@ Adjust section numbers/titles to match the final paper draft.
 
 ## Notes
 
+- Cross-cutting interpretation: these scenarios are support checks. They test whether commit/abstain behavior tracks support quality (uncertainty, scope clarity, rollback readiness, provenance/falsifiers, and replay stability), rather than reward unsupported confidence.
+
 - Source of truth for stop-the-world checks: `replay-suite/v0/ci-gate.json`.
 - Source of truth for full scenario battery: `replay-suite/v0/suite.json`.
 - Source of truth for long-doc retrieval stress checks: `replay-suite/v0/long-doc-stress.json`.

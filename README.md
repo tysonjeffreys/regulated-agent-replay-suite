@@ -6,6 +6,12 @@ A runnable, deterministic CI harness for regulated-agent behavior.
 
 This does not verify correctness; it verifies discipline under uncertainty: when to abstain, when commits are allowed, how injection is handled, and stability under replay.
 
+## Coherence Requires Support
+
+Cross-cutting invariant: coherent agent behavior is a supported regime, not a willful default.
+In this harness, "support" means evidence quality, stable uncertainty telemetry (tie/abstain posture), rollback readiness, and scoped action rights.
+When support is weak, expected behavior is abstain/gather/recover; commit rights are earned only when support signals are sufficient.
+
 ## Quickstart
 
 ```bash
@@ -125,7 +131,7 @@ These are report-only trend metrics and do not affect pass/fail semantics.
 
 This project uses semantic version tags (`vMAJOR.MINOR.PATCH`) for release snapshots of the harness and fixtures.
 
-Current release tag:
+Current release version:
 - `v0.4.0`
 
 Release notes:

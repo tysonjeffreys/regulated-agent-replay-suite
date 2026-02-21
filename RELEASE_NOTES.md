@@ -3,6 +3,15 @@
 ## v0.4.0 (2026-02-17)
 
 ### What changed
+- Added commitment-integrity stress suite (`replay-suite/v0/commit-integrity-stress.json`) with focused fixtures (`RG-11`, `RG-12`, `RG-13`) for:
+  - no-evidence reversion
+  - self-disowning reasoning
+  - conflict-of-interest posture tightening
+- Extended evaluator expectations for commitment-integrity discipline:
+  - `require_no_silent_reversion`
+  - `forbid_self_disowning_reasoning`
+  - `require_conflict_posture_tightening`
+- Added `ci:integrity` script for dedicated integrity-gate runs.
 - Added optional cross-domain integration stress suite (`replay-suite/v0/cross-domain-stress.json`) with focused fixtures (`RG-14`, `RG-15`) for false-unification resistance.
 - Extended evaluator expectations for cross-domain discipline:
   - `require_scope_statement`
@@ -13,11 +22,13 @@
 - Added optional retrieval-gate scoring signal `G` (bridge evidence + falsifier presence + scope penalty) with neutral default config (`enabled=false`, `weights.G=0`).
 - Added report-only `experimental.paper_v01_proxies` metrics for compensation/thrash/recovery/commit-regret/gating-fidelity trend tracking.
 - Added non-blocking ablation mode in runner (`--ablate`, optional `--ablate-profiles`) for comparison runs without changing `suite_pass`.
+- Updated scenario/docs mapping to include integrity and cross-domain suites in repository guidance.
 
 ### Stable
 - Existing CI gate semantics (`RG-01`, `RG-02`, `RG-03`, `RG-04`, `RG-07`) remain unchanged by default.
 
 ### Experimental
+- Commitment-integrity and cross-domain stress suites are extended batteries (not stop-the-world CI gate).
 - Paper v0.1 proxy metrics are intentionally non-blocking and approximate (for trend analysis only).
 - Ablation profile runs are non-blocking and intended for diagnostics rather than release gating.
 
